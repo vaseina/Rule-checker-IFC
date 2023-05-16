@@ -1,0 +1,73 @@
+{
+    "regulation_id": 1,
+    "name": "Norme Tecniche di Attuazione",
+    "description": "Obiettivo fondamentale del Piano Regolatore Generale in adeguamento al Piano Paesistico Ambientale Regionale è la riqualificazione di una città nella quale possa riconoscersi una società articolata e solidale. A tal fine, il Piano si propone di migliorare la qualità e le prestazioni fisiche sociali e culturali dell’intera città e del suo territorio, restituendole centralità di capoluogo ed rafforzandone la natura di città accogliente ed accessibile",
+    "level": 1,
+    "date_of_creation": null,
+    "clauses": [
+        {
+            "clause_id": 1,
+            "name": "Recupero e valorizzazione dell'ex Cava Giuliani per attività artistica con aumento della SUL e realizzazione di manufatto.",
+            "legal_reference": "Art. 54 A)",
+            "description": null,
+            "rules": [
+                {
+                    "rule_id": 1,
+                    "name": "maximum height",
+                    "zone": "Cava Giuliani",
+                    "python_code": "check_building.height <= 7.5"
+                },
+                {
+                    "rule_id": 2,
+                    "name": "maximum volume",
+                    "zone": "Cava Giuliani",
+                    "python_code": "check_building.volume <= 1000"
+                },
+                {
+                    "rule_id": 3,
+                    "name": "building to building distance",
+                    "zone": "Cava Giuliani",
+                    "python_code": "check_building.building_building_distance >= 10"
+                },
+                {
+                    "rule_id": 4,
+                    "name": "building to boundaries distance",
+                    "zone": "Cava Giuliani",
+                    "python_code": "check_building.building_boundaries_distance >= 5"
+                }
+            ]
+        },
+        {
+            "clause_id": 2,
+            "name": "Recupero e valorizzazione dell'ex Cava Angelini per attività artistica con aumento della SUL e realizzazione di manufatto.",
+            "legal_reference": "Art. 54 B)",
+            "description": null,
+            "rules": [
+                {
+                    "rule_id": 5,
+                    "name": "maximum height",
+                    "zone": "Cava Angelini",
+                    "python_code": "check_building.height <= 7.5"
+                },
+                {
+                    "rule_id": 6,
+                    "name": "maximum volume",
+                    "zone": "Cava Angelini",
+                    "python_code": "check_building.volume <= 1000"
+                },
+                {
+                    "rule_id": 7,
+                    "name": "building to building distance",
+                    "zone": "Cava Angelini",
+                    "python_code": "check_building.building_building_distance >= 10"
+                },
+                {
+                    "rule_id": 8,
+                    "name": "building to boundaries distance",
+                    "zone": "Cava Angelini",
+                    "python_code": "check_building.building_boundaries_distance >= 5"
+                }
+            ]
+        }
+    ]
+}

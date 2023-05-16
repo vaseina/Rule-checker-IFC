@@ -1,0 +1,226 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+    font-size: small;
+    --main-color: #f08923;
+    --second-color: #7a7a7a;
+    --background-color: #ffffff;
+    --text-color: #ffffff;
+    --text-color-2: #54595F;
+    --text-color-3: black;
+    --background-color-opacity: #ffffff9d;
+}
+
+html, body {
+    overflow: hidden;
+}
+
+.hidden {
+    visibility: collapse;
+}
+
+.icon {
+    max-width: 20px;
+    max-height: 20px;
+    margin: auto;
+}
+
+.text {
+    color: rgb(173, 173, 173);
+    border-bottom: 1px solid rgb(104, 104, 104);
+    padding: 0.6em 0.6em 0.6em 1em;
+}
+
+.text:hover {
+    background-color: #3e4147;
+}
+
+.text-title {
+    color: rgb(236, 236, 236);
+}
+
+.basic-button {
+    background-color: #202225;
+    width: 100%;
+    height: 40px;
+    border: none;
+    text-align: center;
+}
+
+.basic-button:hover {
+    background-color: var(--main-color);
+    cursor: pointer;
+}
+
+.side-menu {
+    z-index: 1;
+    position: fixed;
+    background-color: #36393F;
+    height: 100vh;
+}
+
+.side-sub-menu {
+    width: 100%;
+    height: inherit;
+    margin: 2px;
+}
+
+.ifcjs-dimension-preview {
+    width: 1rem;
+    height: 1rem;
+    background-color: #FFA50F;
+    border-radius: 1rem;
+    opacity: 0.5;
+}
+
+.ifcjs-dimension-label {
+    background-color: black;
+    color: white;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+#viewer-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#side-menu-left {
+    width: 40px;
+}
+
+#side-menu-right {
+    right: 0;
+    width: 300px;
+}
+
+.loading-overlay {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #f1f1f150;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading-progress {
+    color: black;
+}
+
+.hidden {
+    display: none;
+}
+
+.floating-top {
+    position: absolute;
+    top: 1rem;
+    z-index: 10000;
+    left: 4rem;
+}
+
+.floating-top label {
+    margin-right: 0.5em;
+}
+
+
+
+.all-menus {
+    /* position: absolute;
+    left: 0;
+    display: flex;
+    flex-direction: column; */
+    position: fixed;
+    top: 0px;
+    right: auto;
+    left: 40px;
+    z-index: 10000;
+    width: 20rem;
+    background-color: var(--background-color-opacity);
+}
+
+/* For properties menu */
+.ifc-property-menu {
+    position: relative;
+    background-color: var(--transparent-white);
+    /* opacity: 0; */
+    /* font-weight: 700; */
+    overflow-y: scroll;
+    max-height: 20rem;
+}
+.ifc-property-item {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding: 0.5rem;
+    border-bottom: solid 1px gray;
+}
+.ifc-property-value {
+    width: 100%;
+    text-align: right;
+    /* font-weight: 500; */
+}
+.visible {
+    opacity: 1;
+}
+
+/* Tree view */
+.ifc-tree-menu {
+    position: relative;
+    overflow-y: scroll;
+    background-color: var(--transparent-white);
+    max-height: 17rem;
+}
+
+li ul {
+    user-select: none;
+    cursor: pointer;
+}
+
+/* Remove default bullets */
+ul, #myUL {
+    list-style-type: none;
+}
+
+/* Remove margins and padding from the parent ul */
+#myUL {
+    margin: 0.5rem;
+    padding: 0;
+}
+
+/* Style the caret/arrow */
+.caret {
+    cursor: pointer;
+    user-select: none; /* Prevent text selection */
+}
+
+/* Create the caret/arrow with a unicode, and style it */
+.caret::before {
+    content: "\25B6";
+    display: inline-block;
+    margin-right: 6px;
+}
+
+/* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+.caret-down::before {
+    transform: rotate(90deg);
+}
+
+/* Hide the nested list */
+.nested {
+    display: none;
+}
+
+/* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+.all-menus .active {
+    display: block;
+    margin-left: 10px;
+}
