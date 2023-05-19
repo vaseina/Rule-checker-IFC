@@ -131,13 +131,8 @@ html, body {
     margin-right: 0.5em;
 }
 
-
-
+/* For all menus */
 .all-menus {
-    /* position: absolute;
-    left: 0;
-    display: flex;
-    flex-direction: column; */
     position: fixed;
     top: 0px;
     right: auto;
@@ -146,13 +141,66 @@ html, body {
     width: 20rem;
     background-color: var(--background-color-opacity);
 }
+/* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+.all-menus .active {
+    display: block;
+    margin-left: 10px;
+}
+
+/* For rule-checker */
+.ifc-rule-checker {
+    position: relative;
+    background-color: var(--transparent-white);
+    overflow-y: scroll;
+    max-height: 20rem;
+    border-bottom: dashed 2px gray;
+}
+.validation-message {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding: 0.5rem;
+}
+
+/* For tree view */
+.ifc-tree-menu {
+    position: relative;
+    overflow-y: scroll;
+    background-color: var(--transparent-white);
+    max-height: 17rem;
+    border-bottom: dashed 2px gray;
+}
+li ul {
+    user-select: none;
+    cursor: pointer;
+}
+ul, #myUL {
+    list-style-type: none;
+}
+#myUL {
+    margin: 0.5rem;
+    padding: 0;
+}
+.caret {
+    cursor: pointer;
+    user-select: none; 
+}
+.caret::before {
+    content: "\25B6";
+    display: inline-block;
+    margin-right: 6px;
+}
+.caret-down::before {
+    transform: rotate(90deg);
+}
+.nested {
+    display: none;
+}
 
 /* For properties menu */
 .ifc-property-menu {
     position: relative;
     background-color: var(--transparent-white);
-    /* opacity: 0; */
-    /* font-weight: 700; */
     overflow-y: scroll;
     max-height: 20rem;
 }
@@ -166,61 +214,7 @@ html, body {
 .ifc-property-value {
     width: 100%;
     text-align: right;
-    /* font-weight: 500; */
 }
 .visible {
     opacity: 1;
-}
-
-/* Tree view */
-.ifc-tree-menu {
-    position: relative;
-    overflow-y: scroll;
-    background-color: var(--transparent-white);
-    max-height: 17rem;
-}
-
-li ul {
-    user-select: none;
-    cursor: pointer;
-}
-
-/* Remove default bullets */
-ul, #myUL {
-    list-style-type: none;
-}
-
-/* Remove margins and padding from the parent ul */
-#myUL {
-    margin: 0.5rem;
-    padding: 0;
-}
-
-/* Style the caret/arrow */
-.caret {
-    cursor: pointer;
-    user-select: none; /* Prevent text selection */
-}
-
-/* Create the caret/arrow with a unicode, and style it */
-.caret::before {
-    content: "\25B6";
-    display: inline-block;
-    margin-right: 6px;
-}
-
-/* Rotate the caret/arrow icon when clicked on (using JavaScript) */
-.caret-down::before {
-    transform: rotate(90deg);
-}
-
-/* Hide the nested list */
-.nested {
-    display: none;
-}
-
-/* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
-.all-menus .active {
-    display: block;
-    margin-left: 10px;
 }

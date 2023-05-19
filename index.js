@@ -15,7 +15,7 @@ import {
   IFCBUILDINGSTOREY,
   IFCSLAB,
   IFCWALLSTANDARDCASE,
-
+  IFCBUILDING,
 } from 'web-ifc';
 import {
   MeshBasicMaterial,
@@ -27,7 +27,7 @@ import {
   Material,
   BufferGeometry,
   BufferAttribute,
-  Mesh
+  Mesh,
 } from 'three';
 import { ClippingEdges } from 'web-ifc-viewer/dist/components/display/clipping-planes/clipping-edges';
 import Stats from 'stats.js/src/Stats';
@@ -149,8 +149,13 @@ const loadIfc = async (event) => {
     viewer.edges.toggle('example-edges', false);
     toggleShadow(true);
   };
+  
+  // Building 
 
-  // Add regulations 
+  const building = await logAllElements(IFCBUILDING);
+  console.log(building);
+  
+  // Rregulations 
   
   const jsonFile = './regulations/chek_regulation_prototype.vwip1.json';
 
@@ -282,25 +287,13 @@ loadButton.addEventListener('click', () => {
 });
 loadButton.classList.add('load');
 
-// const sectionButton = createSideMenuButton('./resources/section-plane-down.svg');
-// sectionButton.addEventListener('click', () => {
-//   sectionButton.blur();
-//   viewer.clipper.toggle();
-// });
-
-// const dropBoxButton = createSideMenuButton('./resources/dropbox-icon.svg');
-// dropBoxButton.addEventListener('click', () => {
-//   dropBoxButton.blur();
-//   viewer.dropbox.loadDropboxIfc();
-// });
-
 // Tree view
 const toggler = document.getElementsByClassName("caret");
 for (let i = 0; i < toggler.length; i++) {
     toggler[i].onclick = () => {
         toggler[i].parentElement.querySelector(".nested").classList.toggle("active");
         toggler[i].classList.toggle("caret-down");
-    }
+    };
 };
 
 // FUNCTIONS
@@ -308,22 +301,39 @@ for (let i = 0; i < toggler.length; i++) {
 // Functions for rules/regulations
 function heightComplianceChecking(buildingHeight, maxHeight) {
   if (buildingHeight < maxHeight) {
-    const message = `The height validation has passed. The height of the building is ${buildingHeight} m. The maximum height is ${maxHeight} m`;
+    const message = `! The height validation has passed! The height of the building is ${Math.ceil(buildingHeight * 10) / 10} m. The maximum height is ${maxHeight} m`;
     console.log(message);
+    createValidationMessages(message);
   } else {
-    const message = `The height validation did not pass. The height of the building is ${buildingHeight} m. The maximum height is ${maxHeight} m`;
+    const message = `! The height validation did not pass! The height of the building is ${Math.ceil(buildingHeight * 100) / 100} m. The maximum height is ${maxHeight} m`;
     console.log(message);
+    createValidationMessages(message);
   };
 };
 
 function volumeComplianceChecking(buildingVolume, maxVolume) {
   if (buildingVolume < maxVolume) {
-    const message = `The volume validation has passed. The volume of the building is ${buildingVolume} m3. The maximum volume is ${maxVolume} m3`;
+    const message = `! The volume validation has passed! The volume of the building is ${Math.ceil(buildingVolume * 100) / 100} m3. The maximum volume is ${maxVolume} m3`;
     console.log(message);
+    createValidationMessages(message);
   } else {
-    const message = `The volume validation did not pass. The volume of the building is ${buildingVolume} m3. The maximum volume is ${maxVolume} m3`;
+    const message = `! The volume validation did not pass! The volume of the building is ${Math.ceil(buildingVolume * 100) / 100} m3. The maximum volume is ${maxVolume} m3`;
     console.log(message);
+    createValidationMessages(message);
   };
+};
+
+function createValidationMessages(value) {
+  const validationContainer = document.getElementById('ifc-rule-checker');
+  const validationMessages = document.createElement("div");
+  validationMessages.classList.add("validation-message");
+  
+  if (value === null || value === undefined) value = "undefined";
+  else if (value.value) value = value.value;
+
+  validationMessages.textContent = value;
+
+  validationContainer.appendChild(validationMessages);
 };
 
 function findInRegulations(regulations, key, value) {
@@ -513,11 +523,6 @@ function removeAllChildren(element) {
     element.removeChild(element.firstChild);
   };
 };
-
-//Tooltip
-// tippy('.ifc-tree-menu', {
-//   content: "I'm a Tippy tooltip!",
-// });
 
 function toggleShadow(active) {
   const shadows = Object.values(viewer.shadowDropper.shadows);
