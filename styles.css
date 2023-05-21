@@ -158,10 +158,29 @@ html, body {
 .validation-message {
     display: flex;
     flex-direction: row;
-    width: 100%;
+    /* width: 100%; */
     padding: 0.5rem;
 }
-
+.validation-text {
+    display: flex;
+    flex-direction: row;
+    /* width: 100%; */
+    padding: 0.5rem;
+}
+.validation-icon {
+    display: flex;
+    flex-direction: row;
+    max-width: 20px;
+    max-height: 20px;
+    margin: auto;
+    width: 100%;
+    /* padding: 0.5rem; */
+    /* box-sizing: content-box; */
+}
+img {
+    max-width: 20px;
+    max-height: 20px;
+}
 /* For tree view */
 .ifc-tree-menu {
     position: relative;
@@ -217,4 +236,20 @@ ul, #myUL {
 }
 .visible {
     opacity: 1;
+}
+
+.ifc-property-menu::-webkit-scrollbar,
+.ifc-tree-menu::-webkit-scrollbar,
+.ifc-rule-checker::-webkit-scrollbar {
+  width: 12px;             
+}
+.ifc-property-menu::-webkit-scrollbar-track,
+.ifc-tree-menu::-webkit-scrollbar-track,
+.ifc-rule-checker::-webkit-scrollbar-track {
+  background: var(--background-color-opacity);  
+}
+.ifc-property-menu::-webkit-scrollbar-thumb,
+.ifc-tree-menu::-webkit-scrollbar-thumb,
+.ifc-rule-checker::-webkit-scrollbar-thumb {
+  background-color: var(--main-color); 
 }

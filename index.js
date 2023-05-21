@@ -1,42 +1,27 @@
 import {
-  CameraProjections,
-  IfcViewerAPI
+  IfcViewerAPI,
 } from 'web-ifc-viewer';
 import { createSideMenuButton } from './utils/gui-creator';
 import {
   IFCSPACE,
-  IFCOPENINGELEMENT,
-  IFCFURNISHINGELEMENT,
-  IFCWALL,
-  IFCWINDOW,
-  IFCCURTAINWALL,
-  IFCMEMBER,
-  IFCPLATE,
   IFCBUILDINGSTOREY,
-  IFCSLAB,
-  IFCWALLSTANDARDCASE,
   IFCBUILDING,
 } from 'web-ifc';
 import {
   MeshBasicMaterial,
   LineBasicMaterial,
   Color,
-  Vector2,
-  DepthTexture,
-  WebGLRenderTarget,
-  Material,
-  BufferGeometry,
-  BufferAttribute,
-  Mesh,
+  BoxHelper,
 } from 'three';
 import { ClippingEdges } from 'web-ifc-viewer/dist/components/display/clipping-planes/clipping-edges';
 import Stats from 'stats.js/src/Stats';
+import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
+// import { Tooltip } from '@mui/material';
 
 const container = document.getElementById('viewer-container');
 const viewer = new IfcViewerAPI({ container, backgroundColor: new Color(255, 255, 255) });
 viewer.axes.setAxes();
 viewer.grid.setGrid();
-// viewer.shadowDropper.darkness = 1.5;
 
 // Set up stats
 const stats = new Stats();
@@ -46,11 +31,10 @@ stats.dom.style.right = '0px';
 stats.dom.style.left = 'auto';
 viewer.context.stats = stats;
 
-viewer.context.ifcCamera.cameraControls
+viewer.context.ifcCamera.cameraControls;
 
 const manager = viewer.IFC.loader.ifcManager;
 
-// viewer.IFC.loader.ifcManager.useWebWorkers(true, 'files/IFCWorker.js');
 viewer.IFC.setWasmPath('files/');
 
 viewer.IFC.loader.ifcManager.applyWebIfcConfig({
@@ -61,8 +45,6 @@ viewer.IFC.loader.ifcManager.applyWebIfcConfig({
 viewer.context.renderer.postProduction.active = true;
 
 // Setup loader
-// const lineMaterial = new LineBasicMaterial({ color: 0x555555 });
-// const baseMaterial = new MeshBasicMaterial({ color: 0xffffff, side: 2 });
 
 let first = true;
 let model;
@@ -90,15 +72,11 @@ const loadIfc = async (event) => {
   });
 
   model = await viewer.IFC.loadIfc(selectedFile, false);
-  // model.material.forEach(mat => mat.side = 2);
 
   if (first) first = false
   else {
     ClippingEdges.forceStyleUpdate = true;
   };
-
-  // await createFill(model.modelID);
-  // viewer.edges.create(`${model.modelID}`, model.modelID, lineMaterial, baseMaterial);
 
   await viewer.shadowDropper.renderShadow(model.modelID);
 
@@ -122,14 +100,13 @@ const loadIfc = async (event) => {
   const containerForPlans = document.getElementById('side-menu-left');
 
   allPlans = viewer.plans.getAll(model.modelID);
-  for(const plan of allPlans) {
-    // const currentPlan = viewer.plans.planLists[model.modelID][plan];
 
-    // const button = document.createElement('button');
-    // containerForPlans.appendChild(button);
-    // button.textContent = currentPlan.name;
+  for(const plan of allPlans) {
+
+    const currentPlan = viewer.plans.planLists[model.modelID][plan];
     
     const button = createSideMenuButton('./resources/plan-of-a-house-svgrepo-com.svg');
+    button.setAttribute("title", `Go to the plan ${currentPlan.name}`);
     
     button.onclick = () => {
       viewer.plans.goTo(model.modelID, plan);
@@ -138,11 +115,8 @@ const loadIfc = async (event) => {
     };
   };
 
-  // const button = document.createElement('button');
-  // containerForPlans.appendChild(button);
-  // button.textContent = 'Exit';
-
-  const button = createSideMenuButton('./resources/exit-svgrepo-com.svg');
+  const button = createSideMenuButton('./resources/exit-logout-sign-out-svgrepo-com.svg');
+  button.setAttribute("title", 'Exit floorplan');
 
   button.onclick = () => {
     viewer.plans.exitPlanView();
@@ -234,6 +208,27 @@ const loadIfc = async (event) => {
   // const allAreaValues = findInElementProperties(allIfcSpaces, "AreaValue");
   // console.log(allAreaValues);
 
+  // Building footprint
+
+  // const config = {
+  //   scene: viewer.context.scene,
+  //   modelID: 0,
+  //   ids: [22103],
+  //   customID: "23",
+  //   applyBVH: true
+  // };
+
+  // const subset = viewer.IFC.loader.ifcManager.createSubset(config);
+  // subset.geometry.computeBoundingSphere();
+  // const helper = new BoxHelper(subset, 0xffff00);
+  // viewer.context.scene.add(helper);
+  // console.log(subset);
+  // const el = document.createElement('div');
+  // el.innerHTML = 'hello world';
+  // var obj = new CSS2DObject(el);
+  // obj.position.set(subset.geometry.boundingBox.min.x, subset.geometry.boundingBox.max.y, subset.geometry.boundingBox.min.z);
+  // subset.add(obj); 
+
 
 };
 
@@ -270,17 +265,13 @@ window.ondblclick = async () => {
     const { modelID, id } = result;
     const props = await viewer.IFC.getProperties(modelID, id, true, false);
     console.log(props);
-    createPropertiesMenu(props);
-
-    // const newProps = await viewer.IFC.loader.ifcManager.getPropertySets(model.modelID, id, true);
-    // console.log(newProps);
-    // createPropertiesMenu(newProps);
-    
+    createPropertiesMenu(props);    
   };
 };
 
 //Setup UI
 const loadButton = createSideMenuButton('./resources/section-plane-down.svg');
+loadButton.setAttribute("title", 'Load IFC model');
 loadButton.addEventListener('click', () => {
   loadButton.blur();
   inputElement.click();
@@ -301,11 +292,11 @@ for (let i = 0; i < toggler.length; i++) {
 // Functions for rules/regulations
 function heightComplianceChecking(buildingHeight, maxHeight) {
   if (buildingHeight < maxHeight) {
-    const message = `! The height validation has passed! The height of the building is ${Math.ceil(buildingHeight * 10) / 10} m. The maximum height is ${maxHeight} m`;
+    const message = `The height validation has passed! The height of the building is ${Math.ceil(buildingHeight * 10) / 10} m. The maximum height is ${maxHeight} m`;
     console.log(message);
     createValidationMessages(message);
   } else {
-    const message = `! The height validation did not pass! The height of the building is ${Math.ceil(buildingHeight * 100) / 100} m. The maximum height is ${maxHeight} m`;
+    const message = `The height validation did not pass! The height of the building is ${Math.ceil(buildingHeight * 100) / 100} m. The maximum height is ${maxHeight} m`;
     console.log(message);
     createValidationMessages(message);
   };
@@ -313,11 +304,11 @@ function heightComplianceChecking(buildingHeight, maxHeight) {
 
 function volumeComplianceChecking(buildingVolume, maxVolume) {
   if (buildingVolume < maxVolume) {
-    const message = `! The volume validation has passed! The volume of the building is ${Math.ceil(buildingVolume * 100) / 100} m3. The maximum volume is ${maxVolume} m3`;
+    const message = `The volume validation has passed! The volume of the building is ${Math.ceil(buildingVolume * 100) / 100} m3. The maximum volume is ${maxVolume} m3`;
     console.log(message);
     createValidationMessages(message);
   } else {
-    const message = `! The volume validation did not pass! The volume of the building is ${Math.ceil(buildingVolume * 100) / 100} m3. The maximum volume is ${maxVolume} m3`;
+    const message = `The volume validation did not pass! The volume of the building is ${Math.ceil(buildingVolume * 100) / 100} m3. The maximum volume is ${maxVolume} m3`;
     console.log(message);
     createValidationMessages(message);
   };
@@ -327,12 +318,24 @@ function createValidationMessages(value) {
   const validationContainer = document.getElementById('ifc-rule-checker');
   const validationMessages = document.createElement("div");
   validationMessages.classList.add("validation-message");
+
+  const validationText = document.createElement("div");
+  validationText.classList.add("validation-text");
+  const validationIcon = document.createElement("div");
+  validationIcon.classList.add("validation-icon");
   
   if (value === null || value === undefined) value = "undefined";
   else if (value.value) value = value.value;
+  validationText.textContent = value;
 
-  validationMessages.textContent = value;
+  if (value.includes("did not")) {
+    validationIcon.innerHTML = '<img src="./resources/gui-check-no-svgrepo-com.svg">';
+  } else if (value.includes("has passed")) {
+    validationIcon.innerHTML = '<img src="./resources/gui-check-yes-svgrepo-com.svg">';
+  }
 
+  validationMessages.appendChild(validationIcon);
+  validationMessages.appendChild(validationText);
   validationContainer.appendChild(validationMessages);
 };
 
@@ -486,7 +489,6 @@ function createSimpleChild(parent, node) {
 const propsGUI = document.getElementById('ifc-property-menu-root');
 
 function createPropertiesMenu(properties) {
-  // console.log(properties);
 
   removeAllChildren(propsGUI);
 
