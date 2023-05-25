@@ -6,17 +6,29 @@ import {
   IFCSPACE,
   IFCBUILDINGSTOREY,
   IFCBUILDING,
+  IFCWINDOW,
+  IFCWALL,
 } from 'web-ifc';
 import {
   MeshBasicMaterial,
   LineBasicMaterial,
   Color,
   BoxHelper,
+  BufferGeometry,
+  BufferAttribute,
+  Mesh,
 } from 'three';
 import { ClippingEdges } from 'web-ifc-viewer/dist/components/display/clipping-planes/clipping-edges';
 import Stats from 'stats.js/src/Stats';
 import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer';
-// import { Tooltip } from '@mui/material';
+import {
+  acceleratedRaycast, 
+  computeBoundsTree, 
+  disposeBoundsTree 
+} from 'three-mesh-bvh';
+import {
+  IFCLoader
+} from 'web-ifc-three/IFCLoader'
 
 const container = document.getElementById('viewer-container');
 const viewer = new IfcViewerAPI({ container, backgroundColor: new Color(255, 255, 255) });
@@ -46,6 +58,14 @@ viewer.context.renderer.postProduction.active = true;
 
 // Setup loader
 
+const ifcLoader = new IFCLoader();
+ifcLoader.ifcManager.setupThreeMeshBVH(
+  computeBoundsTree,
+  disposeBoundsTree,
+  acceleratedRaycast
+);
+
+const scene = viewer.context.getScene();
 let first = true;
 let model;
 let allPlans;
@@ -210,25 +230,49 @@ const loadIfc = async (event) => {
 
   // Building footprint
 
-  // const config = {
-  //   scene: viewer.context.scene,
-  //   modelID: 0,
-  //   ids: [22103],
-  //   customID: "23",
-  //   applyBVH: true
-  // };
+  const wallIds = await viewer.IFC.loader.ifcManager.getAllItemsOfType(model.modelID, IFCWALL, false);
+  console.log(wallIds);
+  const subset = createSubset(wallIds);
+  function createSubset(id) {
+    return viewer.IFC.loader.ifcManager.createSubset({
+      modelID: model.modelID,
+      scene: scene,
+      ids: id,
+      removePrevious: true,
+      customID: "original",
+      applyBVH: true
+    });
+  };
 
-  // const subset = viewer.IFC.loader.ifcManager.createSubset(config);
-  // subset.geometry.computeBoundingSphere();
-  // const helper = new BoxHelper(subset, 0xffff00);
-  // viewer.context.scene.add(helper);
-  // console.log(subset);
+  const coordinates = [];
+  const alreadySaved = new Set();
+  const position = subset.geometry.attributes.position;
+  for(let index of subset.geometry.index.array) {
+    if(!alreadySaved.has(index)){
+      coordinates.push(position.getX(index));
+      coordinates.push(position.getY(index));
+      coordinates.push(position.getZ(index));
+      alreadySaved.add(index);
+    };
+  };
+  const vertices = Float32Array.from(coordinates);
+
+  const geometryToExport = new BufferGeometry();
+  const newVertices = new BufferAttribute(vertices, 3);
+  geometryToExport.setAttribute('position', newVertices);
+  const mesh = new Mesh(geometryToExport);
+  
+  mesh.geometry.computeBoundingBox();
+  const helper = new BoxHelper(subset, 0xff0000);
+  scene.add(helper);
+
+  model.visible = false;
+
   // const el = document.createElement('div');
   // el.innerHTML = 'hello world';
   // var obj = new CSS2DObject(el);
   // obj.position.set(subset.geometry.boundingBox.min.x, subset.geometry.boundingBox.max.y, subset.geometry.boundingBox.min.z);
   // subset.add(obj); 
-
 
 };
 
@@ -303,7 +347,11 @@ function heightComplianceChecking(buildingHeight, maxHeight) {
 };
 
 function volumeComplianceChecking(buildingVolume, maxVolume) {
-  if (buildingVolume < maxVolume) {
+  if (buildingVolume === 0) {
+    const message = `The volume is not specified and is equal to 0. Please add IfcSpace to your model. The maximum volume is ${maxVolume} m3`;
+    console.log(message);
+    createValidationMessages(message);
+  } else if (buildingVolume < maxVolume) {
     const message = `The volume validation has passed! The volume of the building is ${Math.ceil(buildingVolume * 100) / 100} m3. The maximum volume is ${maxVolume} m3`;
     console.log(message);
     createValidationMessages(message);
@@ -328,11 +376,11 @@ function createValidationMessages(value) {
   else if (value.value) value = value.value;
   validationText.textContent = value;
 
-  if (value.includes("did not")) {
-    validationIcon.innerHTML = '<img src="./resources/gui-check-no-svgrepo-com.svg">';
-  } else if (value.includes("has passed")) {
+  if (value.includes("has passed")) {
     validationIcon.innerHTML = '<img src="./resources/gui-check-yes-svgrepo-com.svg">';
-  }
+  } else {
+    validationIcon.innerHTML = '<img src="./resources/gui-check-no-svgrepo-com.svg">';
+  };
 
   validationMessages.appendChild(validationIcon);
   validationMessages.appendChild(validationText);
