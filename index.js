@@ -51,7 +51,7 @@ viewer.IFC.setWasmPath('files/');
 
 viewer.IFC.loader.ifcManager.applyWebIfcConfig({
   USE_FAST_BOOLS: true,
-  COORDINATE_TO_ORIGIN: true
+  COORDINATE_TO_ORIGIN: true // important
 });
 
 viewer.context.renderer.postProduction.active = true;
@@ -230,49 +230,56 @@ const loadIfc = async (event) => {
 
   // Building footprint
 
-  const wallIds = await viewer.IFC.loader.ifcManager.getAllItemsOfType(model.modelID, IFCWALL, false);
-  console.log(wallIds);
-  const subset = createSubset(wallIds);
-  function createSubset(id) {
-    return viewer.IFC.loader.ifcManager.createSubset({
-      modelID: model.modelID,
-      scene: scene,
-      ids: id,
-      removePrevious: true,
-      customID: "original",
-      applyBVH: true
-    });
-  };
+  // const wallIds = await viewer.IFC.loader.ifcManager.getAllItemsOfType(model.modelID, IFCWALL, false);
+  // console.log(wallIds);
+  // const subset = createSubset(wallIds);
+  // function createSubset(id) {
+  //   return viewer.IFC.loader.ifcManager.createSubset({
+  //     modelID: model.modelID,
+  //     scene: scene,
+  //     ids: id,
+  //     removePrevious: true,
+  //     customID: "original",
+  //     applyBVH: true
+  //   });
+  // };
 
-  const coordinates = [];
-  const alreadySaved = new Set();
-  const position = subset.geometry.attributes.position;
-  for(let index of subset.geometry.index.array) {
-    if(!alreadySaved.has(index)){
-      coordinates.push(position.getX(index));
-      coordinates.push(position.getY(index));
-      coordinates.push(position.getZ(index));
-      alreadySaved.add(index);
-    };
-  };
-  const vertices = Float32Array.from(coordinates);
+  // const coordinates = [];
+  // const alreadySaved = new Set();
+  // const position = subset.geometry.attributes.position;
+  // for(let index of subset.geometry.index.array) {
+  //   if(!alreadySaved.has(index)){
+  //     coordinates.push(position.getX(index));
+  //     coordinates.push(position.getY(index));
+  //     coordinates.push(position.getZ(index));
+  //     alreadySaved.add(index);
+  //   };
+  // };
+  // const vertices = Float32Array.from(coordinates); 
+  // const newVertices = new BufferAttribute(vertices, 3);
 
-  const geometryToExport = new BufferGeometry();
-  const newVertices = new BufferAttribute(vertices, 3);
-  geometryToExport.setAttribute('position', newVertices);
-  const mesh = new Mesh(geometryToExport);
+  // const geometryToExport = new BufferGeometry();
+  // geometryToExport.setAttribute('position', newVertices); 
+  // const mesh = new Mesh(geometryToExport);
   
-  mesh.geometry.computeBoundingBox();
-  const helper = new BoxHelper(subset, 0xff0000);
-  scene.add(helper);
+  // mesh.geometry.computeBoundingBox();
+  // const helper = new BoxHelper(mesh, 0xff0000);
+  // scene.add(helper);
 
-  model.visible = false;
+  // you simply need to apply a transformation matrix 
+  // to align it with its direction
+
+  // viewer.IFC.loader.ifcManager.setupCoordinationMatrix(new Matrix4().setPosition(-this.globalShift.x, -this.globalShift.y, 0).multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2)));
+
 
   // const el = document.createElement('div');
   // el.innerHTML = 'hello world';
   // var obj = new CSS2DObject(el);
   // obj.position.set(subset.geometry.boundingBox.min.x, subset.geometry.boundingBox.max.y, subset.geometry.boundingBox.min.z);
   // subset.add(obj); 
+
+  // model.visible = false;
+ 
 
 };
 
